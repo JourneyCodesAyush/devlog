@@ -3,6 +3,7 @@
 ![Go](https://img.shields.io/badge/Go-1.27-00ADD8?logo=go&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-lightgrey)
+![CI](https://github.com/journeycodesayush/devlog/actions/workflows/ci.yml/badge.svg)
 
 ---
 
