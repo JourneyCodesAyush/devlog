@@ -81,7 +81,6 @@ func main() {
 			printHelp()
 			os.Exit(1)
 		}
-		_ = list
 
 		for _, ent := range list {
 			fmt.Println(&ent)
