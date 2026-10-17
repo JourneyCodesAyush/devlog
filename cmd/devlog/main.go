@@ -27,29 +27,29 @@ Commands:
 Run 'devlog help' to see this message.`)
 }
 
+func openStore() (*store.SQLiteStore, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, fmt.Errorf("finding home directory: %w", err)
+	}
+
+	dbDir := filepath.Join(homeDir, ".devlog")
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		return nil, fmt.Errorf("creating %s: %w", dbDir, err)
+	}
+
+	return store.New(filepath.Join(dbDir, "devlog.db"))
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		printHelp()
 		os.Exit(1)
 	}
 
-	homeDir, err := os.UserHomeDir()
+	st, err := openStore()
 	if err != nil {
-		fmt.Println("Unable to access home directory")
-		os.Exit(1)
-	}
-
-	dbDir := filepath.Join(homeDir, ".devlog")
-	if err := os.MkdirAll(dbDir, 0755); err != nil {
-		fmt.Println("Unable to create devlog directory:", err)
-		os.Exit(1)
-	}
-
-	dbPath := filepath.Join(dbDir, "devlog.db")
-
-	st, err := store.New(dbPath)
-	if err != nil {
-		fmt.Printf("%v", err)
+		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
