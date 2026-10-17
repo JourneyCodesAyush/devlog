@@ -20,7 +20,7 @@ Usage:
 
 Commands:
   add [-t tag] "message"      Add a new entry
-  list [--today] [--since 7d] List entries
+  list [-n count]             List entries (latest first; all if -n omitted)
   search "keyword"            Search entries by keyword
   delete <id>                 Delete an entry by id
 
@@ -82,18 +82,18 @@ func main() {
 		fmt.Println("Entry added successfully")
 	case "list":
 		listCmd := flag.NewFlagSet("list", flag.ExitOnError)
-		listCmd.Bool("today", false, "logs saved today")
+		n := listCmd.Int("n", 0, "show only the latest n entries (0 = all)")
 
 		listCmd.Parse(os.Args[2:])
 
-		if listCmd.NArg() > 0 {
-			fmt.Println("Usage: devlog list [-today] [-since 7d]")
+		if listCmd.NArg() > 0 || *n < 0 {
+			fmt.Println("Usage: devlog list [-n count]")
 			os.Exit(1)
 		}
 
-		list, err := st.List()
+		list, err := st.List(*n)
 		if err != nil {
-			printHelp()
+			fmt.Println("Error listing entries:", err)
 			os.Exit(1)
 		}
 

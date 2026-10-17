@@ -66,8 +66,16 @@ func (s *SQLiteStore) Delete(id int) error {
 	return nil
 }
 
-func (s *SQLiteStore) List() ([]entry.Entry, error) {
-	rows, err := s.db.Query("SELECT * FROM entries")
+func (s *SQLiteStore) List(limit int) ([]entry.Entry, error) {
+	query := "SELECT * FROM entries ORDER BY created_at DESC, id DESC"
+	var args []any
+
+	if limit > 0 {
+		query += " LIMIT ?"
+		args = append(args, limit)
+	}
+
+	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		return make([]entry.Entry, 0), fmt.Errorf("querying entry: %w", err)
 	}
