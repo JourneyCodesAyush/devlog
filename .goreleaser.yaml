@@ -1,0 +1,36 @@
+version: 2
+
+project_name: devlog
+
+builds:
+  - id: devlog
+    main: .
+    binary: devlog
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+    goarch:
+      - amd64
+
+archives:
+  - id: devlog-zip
+    formats:
+      - zip
+    name_template: "devlog_{{ .Version }}_windows_x86_64"
+    files:
+      - none*
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  prerelease: auto
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^chore:"
+      - "^ci:"
