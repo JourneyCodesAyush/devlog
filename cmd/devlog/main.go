@@ -59,7 +59,7 @@ func main() {
 		tag := addCmd.String("t", "", "tag for the entry")
 		addCmd.Parse(os.Args[2:])
 
-		if addCmd.NArg() < 1 {
+		if addCmd.NArg() != 1 {
 			fmt.Println("Usage: devlog add [-t tag] \"message\"")
 			os.Exit(1)
 		}
@@ -75,8 +75,13 @@ func main() {
 		listCmd.Bool("today", false, "logs saved today")
 
 		listCmd.Parse(os.Args[2:])
-		list, err := st.List()
 
+		if listCmd.NArg() > 0 {
+			fmt.Println("Usage: devlog list [-today] [-since 7d]")
+			os.Exit(1)
+		}
+
+		list, err := st.List()
 		if err != nil {
 			printHelp()
 			os.Exit(1)
