@@ -101,3 +101,26 @@ func (s *SQLiteStore) List(limit int) ([]entry.Entry, error) {
 
 	return entries, nil
 }
+
+func (s *SQLiteStore) Search(keyword string) ([]entry.Entry, error) {
+	query := "SELECT * FROM entries WHERE message LIKE ? ORDER BY created_at DESC, id DESC"
+	rows, err := s.db.Query(query, "%"+keyword+"%")
+	if err != nil {
+		return make([]entry.Entry, 0), fmt.Errorf("querying entry: %w", err)
+	}
+
+	defer rows.Close()
+
+	entries := make([]entry.Entry, 0)
+	for rows.Next() {
+		var ent entry.Entry
+		if err := rows.Scan(&ent.Id, &ent.Message, &ent.Tag, &ent.Project, &ent.CreatedAt); err != nil {
+			return nil, fmt.Errorf("scanning entry: %w", err)
+		}
+		entries = append(entries, ent)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("reading rows: %w", err)
+	}
+	return entries, nil
+}

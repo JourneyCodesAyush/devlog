@@ -128,6 +128,34 @@ func main() {
 			fmt.Println("Error deleting message with id: ", id)
 			os.Exit(1)
 		}
+	case "search":
+		searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
+
+		searchCmd.Parse(os.Args[2:])
+
+		if searchCmd.NArg() != 1 {
+			fmt.Println("Usage: devlog search \"keyword\"")
+			os.Exit(1)
+		}
+
+		keyword := searchCmd.Arg(0)
+		matches, err := st.Search(keyword)
+		if err != nil {
+			fmt.Println("Error searching entries:", err)
+			os.Exit(1)
+		}
+
+		if len(matches) == 0 {
+			fmt.Println("No matches.")
+			break
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintln(w, "ID\tTIME\tTAG\tPROJECT\tMESSAGE")
+		for _, ent := range matches {
+			fmt.Fprintln(w, strings.Join(ent.Fields(), "\t"))
+		}
+		w.Flush()
 	case "help":
 		printHelp()
 	default:
