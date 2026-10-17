@@ -19,7 +19,7 @@ Usage:
   devlog <command> [arguments]
 
 Commands:
-  add "message" [-t tag]      Add a new entry
+  add [-t tag] "message"      Add a new entry
   list [--today] [--since 7d] List entries
   search "keyword"            Search entries by keyword
   delete <id>                 Delete an entry by id
@@ -60,14 +60,12 @@ func main() {
 		addCmd.Parse(os.Args[2:])
 
 		if addCmd.NArg() < 1 {
-			fmt.Println("Usage: devlog add \"message\" [-t tag]")
+			fmt.Println("Usage: devlog add [-t tag] \"message\"")
 			os.Exit(1)
 		}
 
 		message := addCmd.Arg(0)
-		_ = tag
-
-		if err := st.Add(message); err != nil {
+		if err := st.Add(message, *tag); err != nil {
 			fmt.Println("Error adding entry: ", err)
 			os.Exit(1)
 		}

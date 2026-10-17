@@ -46,8 +46,12 @@ func New(path string) (*SQLiteStore, error) {
 	return &SQLiteStore{db: db}, nil
 }
 
-func (s *SQLiteStore) Add(message string) error {
-	_, err := s.db.Exec("INSERT INTO entries (message) VALUES (?)", message)
+func (s *SQLiteStore) Add(message string, tag string) error {
+	var tagVal sql.NullString
+	if tag != "" {
+		tagVal = sql.NullString{String: tag, Valid: true}
+	}
+	_, err := s.db.Exec("INSERT INTO entries (message, tag) VALUES (?, ?)", message, tagVal)
 	if err != nil {
 		return fmt.Errorf("adding entry: %w", err)
 	}
