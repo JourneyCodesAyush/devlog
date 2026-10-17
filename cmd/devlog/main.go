@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/journeycodesayush/devlog/internal/entry"
 	"github.com/journeycodesayush/devlog/internal/store"
 )
 
@@ -39,6 +40,15 @@ func openStore() (*store.SQLiteStore, error) {
 	}
 
 	return store.New(filepath.Join(dbDir, "devlog.db"))
+}
+
+func printEntries(list []entry.Entry) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "ID\tTIME\tTAG\tPROJECT\tMESSAGE")
+	for _, ent := range list {
+		fmt.Fprintln(w, strings.Join(ent.Fields(), "\t"))
+	}
+	w.Flush()
 }
 
 func main() {
@@ -102,12 +112,7 @@ func main() {
 			break
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tTIME\tTAG\tPROJECT\tMESSAGE")
-		for _, ent := range list {
-			fmt.Fprintln(w, strings.Join(ent.Fields(), "\t"))
-		}
-		w.Flush()
+		printEntries(list)
 	case "delete":
 		deleteCmd := flag.NewFlagSet("delete", flag.ExitOnError)
 		deleteCmd.Parse(os.Args[2:])
@@ -150,12 +155,7 @@ func main() {
 			break
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tTIME\tTAG\tPROJECT\tMESSAGE")
-		for _, ent := range matches {
-			fmt.Fprintln(w, strings.Join(ent.Fields(), "\t"))
-		}
-		w.Flush()
+		printEntries(matches)
 	case "help":
 		printHelp()
 	default:

@@ -66,6 +66,21 @@ func (s *SQLiteStore) Delete(id int) error {
 	return nil
 }
 
+func scanEntries(rows *sql.Rows) ([]entry.Entry, error) {
+	entries := make([]entry.Entry, 0)
+	for rows.Next() {
+		var ent entry.Entry
+		if err := rows.Scan(&ent.Id, &ent.Message, &ent.Tag, &ent.Project, &ent.CreatedAt); err != nil {
+			return nil, fmt.Errorf("scanning entry: %w", err)
+		}
+		entries = append(entries, ent)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("reading rows: %w", err)
+	}
+	return entries, nil
+}
+
 func (s *SQLiteStore) List(limit int) ([]entry.Entry, error) {
 	query := "SELECT * FROM entries ORDER BY created_at DESC, id DESC"
 	var args []any
@@ -81,25 +96,7 @@ func (s *SQLiteStore) List(limit int) ([]entry.Entry, error) {
 	}
 
 	defer rows.Close()
-
-	entries := make([]entry.Entry, 0)
-
-	for rows.Next() {
-		var ent entry.Entry
-		err := rows.Scan(&ent.Id, &ent.Message, &ent.Tag, &ent.Project, &ent.CreatedAt)
-
-		if err != nil {
-			return make([]entry.Entry, 0), fmt.Errorf("querying entry: %w", err)
-		}
-
-		entries = append(entries, ent)
-	}
-
-	if err = rows.Err(); err != nil {
-		return make([]entry.Entry, 0), fmt.Errorf("querying entry: %w", err)
-	}
-
-	return entries, nil
+	return scanEntries(rows)
 }
 
 func (s *SQLiteStore) Search(keyword string) ([]entry.Entry, error) {
@@ -110,17 +107,5 @@ func (s *SQLiteStore) Search(keyword string) ([]entry.Entry, error) {
 	}
 
 	defer rows.Close()
-
-	entries := make([]entry.Entry, 0)
-	for rows.Next() {
-		var ent entry.Entry
-		if err := rows.Scan(&ent.Id, &ent.Message, &ent.Tag, &ent.Project, &ent.CreatedAt); err != nil {
-			return nil, fmt.Errorf("scanning entry: %w", err)
-		}
-		entries = append(entries, ent)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("reading rows: %w", err)
-	}
-	return entries, nil
+	return scanEntries(rows)
 }
