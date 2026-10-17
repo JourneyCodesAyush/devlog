@@ -47,6 +47,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	switch os.Args[1] {
+	case "add", "list", "search", "delete":
+	case "help":
+		printHelp()
+		os.Exit(0)
+	default:
+		printHelp()
+		os.Exit(1)
+	}
+
 	st, err := openStore()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
