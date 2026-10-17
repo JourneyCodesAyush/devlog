@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"text/tabwriter"
 
 	"github.com/journeycodesayush/devlog/internal/store"
 )
@@ -82,10 +84,17 @@ func main() {
 			os.Exit(1)
 		}
 
-		for _, ent := range list {
-			fmt.Println(&ent)
+		if len(list) == 0 {
+			fmt.Println("No entries.")
+			break
 		}
 
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintln(w, "ID\tTIME\tTAG\tPROJECT\tMESSAGE")
+		for _, ent := range list {
+			fmt.Fprintln(w, strings.Join(ent.Fields(), "\t"))
+		}
+		w.Flush()
 	case "delete":
 		deleteCmd := flag.NewFlagSet("delete", flag.ExitOnError)
 		deleteCmd.Parse(os.Args[2:])
