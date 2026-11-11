@@ -72,6 +72,7 @@ func main() {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
+	defer st.Close()
 
 	switch os.Args[1] {
 	case "add":

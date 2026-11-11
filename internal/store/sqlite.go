@@ -49,6 +49,10 @@ func New(path string) (*SQLiteStore, error) {
 	return &SQLiteStore{db: db}, nil
 }
 
+func (s *SQLiteStore) Close() error {
+	return s.db.Close()
+}
+
 func (s *SQLiteStore) Add(message string, tag string) error {
 	var tagVal sql.NullString
 	if tag != "" {
