@@ -25,6 +25,9 @@ CREATE INDEX IF NOT EXISTS idx_entries_created_at ON entries(created_at);
 CREATE INDEX IF NOT EXISTS idx_entries_tag ON entries(tag);
 `
 
+// entryColumns must match the Scan order in scanEntries
+const entryColumns = "id, message, tag, project, created_at"
+
 func initializeDatabase(db *sql.DB) error {
 	_, err := db.Exec(schema)
 	return err
@@ -82,7 +85,7 @@ func scanEntries(rows *sql.Rows) ([]entry.Entry, error) {
 }
 
 func (s *SQLiteStore) List(limit int) ([]entry.Entry, error) {
-	query := "SELECT * FROM entries ORDER BY created_at DESC, id DESC"
+	query := "SELECT " + entryColumns + " FROM entries ORDER BY created_at DESC, id DESC"
 	var args []any
 
 	if limit > 0 {
@@ -100,7 +103,7 @@ func (s *SQLiteStore) List(limit int) ([]entry.Entry, error) {
 }
 
 func (s *SQLiteStore) Search(keyword string) ([]entry.Entry, error) {
-	query := "SELECT * FROM entries WHERE message LIKE ? ORDER BY created_at DESC, id DESC"
+	query := "SELECT " + entryColumns + " FROM entries WHERE message LIKE ? ORDER BY created_at DESC, id DESC"
 	rows, err := s.db.Query(query, "%"+keyword+"%")
 	if err != nil {
 		return make([]entry.Entry, 0), fmt.Errorf("querying entry: %w", err)
