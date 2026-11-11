@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const timeLayout = "2006-01-02 15:04"
+
 type Entry struct {
 	Id        int
 	Message   string
@@ -26,7 +28,7 @@ func (e *Entry) Fields() []string {
 
 	return []string{
 		strconv.Itoa(e.Id),
-		e.CreatedAt.Local().Format("2006-01-02 15:04"),
+		e.CreatedAt.Local().Format(timeLayout),
 		tag,
 		project,
 		e.Message,
